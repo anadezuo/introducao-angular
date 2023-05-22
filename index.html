@@ -33,14 +33,27 @@
           <td>{{student.firstNote}}</td>
           <td>{{student.secondNote}}</td>
           <td>{{student.thirdNote}}</td>
-          <td>{{average(student)}}</td>
+          <td>{{student.average}}</td>
         </tr>
       </tbody>
     </table>
   </main>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script src='lib/angular/angular.min.js'></script>
   <script type="text/javascript">
+    /*  Anotações
+    
+    Directivas
+    - Temos a diretiva ng-bind, que pode ser utilizada para consultar
+    valores no controller, ao invés de pegar o valor direto com interpolação.
+    Como o Angular pode levar um tempinho para ser carregado, o valor
+    pego com interpolação podem aparecer entre colchetes {{}}, enquanto que com ng-bind,\
+    esse valor só aparecerá quando o Angular for carregado.
+    Outra opção é carregar o Angular no <head/> (deixa pesado - melhor deixar os scripts embaixo).
+
+    */
+
     angular.module("myModule",[])
     .controller("indexController", function($scope){
       $scope.title = "Sistema com Angular JS"
@@ -52,13 +65,23 @@
         { name: "Sofia", email: "sofia@email.com", firstNote: 35, secondNote: 50, thirdNote: 80 }
       ]
 
-      $scope.average = function(Student){
-        var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3;
-        return average.toFixed(2);
+      var  init = function(){
+        $scope.students.forEach(function(student){
+          student.average = average(student)
+        })
+      }
+
+      var average = function (Student) {
+        var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3
+        return average.toFixed(2)
       };
 
+      // $scope.average = function(Student){
+      //   var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3;
+      //   return average.toFixed(2);
+      // };
 
-
+      init();
     })
   </script>
 </body>
