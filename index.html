@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="myModule">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <title>Angular</title>
 </head>
+
 <body ng-controller="indexController">
   <header class="container">
     <h2 ng-bind="title"></h2>
@@ -37,10 +39,59 @@
         </tr>
       </tbody>
     </table>
+    <div class="row">
+      <a class="waves-effect waves-light btn modal-trigger modal-close" href="#addStudentModal">Adicionar</a>
+    </div>
   </main>
+
+
+  <!-- Modal Structure -->
+  <div id="addStudentModal" class="modal">
+    <div class="modal-content">
+      <h4>Adicionar Aluno</h4>
+      <p>Preencha os dados do aluno</p>
+      <div class="row">
+        <div class="input-field col m6 s12">
+          <input type="text" ng-model="Student.name" class="validate">
+          <label>Nome</label>
+        </div>
+        <div class="input-field col m6 s12">
+          <input id="email" type="email" ng-model="Student.email" class="validate">
+          <label>Email</label>
+        </div>
+        <div class="input-field col m4 s12">
+          <input type="text" ng-model="Student.firstNote" class="validate">
+          <label>Nota 1</label>
+        </div>
+        <div class="input-field col m4 s12">
+          <input type="text" ng-model="Student.secondNote" class="validate">
+          <label>Nota 2</label>
+        </div>
+        <div class="input-field col m4 s12">
+          <input type="text" ng-model="Student.thirdNote" class="validate">
+          <label>Nota 3</label>
+        </div>
+      </div>
+    </div>
+   
+    <div class="modal-footer">
+      <a class="modal-close waves-effect waves-green btn-flat" href="#!">Cancelar</a>
+      <a ng-click="addStudent(Student)" class="waves-effect waves-light btn">Salvar</a>
+    </div>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script src='lib/angular/angular.min.js'></script>
+
+  <script type="text/javascript">
+    //bloco de inicialização do materialize
+    document.addEventListener('DOMContentLoaded', function () {
+      var elem = document.querySelectorAll('.modal')
+      var instance = M.Modal.init(elem)
+    });
+
+  </script>
+
   <script type="text/javascript">
     /*  Anotações
     
@@ -54,36 +105,49 @@
 
     */
 
-    angular.module("myModule",[])
-    .controller("indexController", function($scope){
-      $scope.title = "Sistema com Angular JS"
-      $scope.students = [
-        { name: "Diana", email: "diana@email.com", firstNote: 85, secondNote: 80, thirdNote: 100 },
-        { name: "Laura", email: "laura@email.com", firstNote: 100, secondNote: 80, thirdNote: 55 },
-        { name: "Paulo", email: "paulo@email.com", firstNote: 65, secondNote: 90, thirdNote: 99 },
-        { name: "Pedro", email: "pedro@email.com", firstNote: 35, secondNote: 60, thirdNote: 55 },
-        { name: "Sofia", email: "sofia@email.com", firstNote: 35, secondNote: 50, thirdNote: 80 }
-      ]
+    angular.module("myModule", [])
+      .controller("indexController", function ($scope) {
+        $scope.title = "Sistema com Angular JS"
+        $scope.students = [
+          { name: "Diana", email: "diana@email.com", firstNote: 85, secondNote: 80, thirdNote: 100 },
+          { name: "Laura", email: "laura@email.com", firstNote: 100, secondNote: 80, thirdNote: 55 },
+          { name: "Paulo", email: "paulo@email.com", firstNote: 65, secondNote: 90, thirdNote: 99 },
+          { name: "Pedro", email: "pedro@email.com", firstNote: 35, secondNote: 60, thirdNote: 55 },
+          { name: "Sofia", email: "sofia@email.com", firstNote: 35, secondNote: 50, thirdNote: 80 }
+        ]
 
-      var  init = function(){
-        $scope.students.forEach(function(student){
-          student.average = average(student)
-        })
-      }
+        var init = function () {
+          $scope.students.forEach(function (student) {
+            student.average = average(student)
+          })
+        }
 
-      var average = function (Student) {
-        var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3
-        return average.toFixed(2)
-      };
+        var average = function (Student) {
+          var average = (parseFloat(Student.firstNote) + parseFloat(Student.secondNote) + parseFloat(Student.thirdNote)) / 3
+          return average.toFixed(2)
+        }
 
-      // $scope.average = function(Student){
-      //   var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3;
-      //   return average.toFixed(2);
-      // };
+        // $scope.average = function(Student){
+        //   var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3;
+        //   return average.toFixed(2);
+        // };
 
-      init();
-    })
+        var closeAddStudentModal = function(){
+          var elem = document.querySelector('#addStudentModal')
+          var instance = M.Modal.getInstance(elem)
+          instance.close();
+        }
+
+        $scope.addStudent = function (Student) {
+          Student.average = average(Student)
+          $scope.students.push(Student)
+          $scope.Student = {} //apagando registro, assim mesmo?
+          closeAddStudentModal()
+        }
+
+        init()
+      })
   </script>
 </body>
-</html>
 
+</html>
