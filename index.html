@@ -10,37 +10,42 @@
 </head>
 
 <body ng-controller="indexController">
-  <header class="container">
+  <header class="container row">
     <h2 ng-bind="title"></h2>
   </header>
   <main class="container">
     <div class="row">
       <input type="text" ng-model="search.name" placeholder="Busca pelo nome do aluno" id="">
     </div>
-    <table class="striped">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Nota 1</th>
-          <th>Nota 2</th>
-          <th>Nota 3</th>
-          <th>Média</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="student in students | filter:search">
-          <td>{{student.name}}</td>
-          <td>{{student.email}}</td>
-          <td>{{student.firstNote}}</td>
-          <td>{{student.secondNote}}</td>
-          <td>{{student.thirdNote}}</td>
-          <td>{{student.average}}</td>
-        </tr>
-      </tbody>
-    </table>
     <div class="row">
-      <a class="waves-effect waves-light btn modal-trigger modal-close" href="#addStudentModal">Adicionar</a>
+      <table class="striped">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Nota 1</th>
+            <th>Nota 2</th>
+            <th>Nota 3</th>
+            <th>Média</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="student in students | filter:search">
+            <td>{{student.name}}</td>
+            <td>{{student.email}}</td>
+            <td>{{student.firstNote}}</td>
+            <td>{{student.secondNote}}</td>
+            <td>{{student.thirdNote}}</td>
+            <td>{{student.average}}</td>
+            <td><button ng-click="editStudentModal(student)" class="btn">Editar</button></td>
+            <td><button ng-click="deleteStudent(student)" class="btn red">Excluir</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row">
+      <a ng-click="addStudent()" class="waves-effect waves-light btn">Adicionar</a>
     </div>
   </main>
 
@@ -48,35 +53,31 @@
   <!-- Modal Structure -->
   <div id="addStudentModal" class="modal">
     <div class="modal-content">
-      <h4>Adicionar Aluno</h4>
+      <h4 ng-if="!isEdit">Adicionar Aluno</h4>
+      <h4 ng-if="isEdit">Editar Aluno</h4>
       <p>Preencha os dados do aluno</p>
       <div class="row">
         <div class="input-field col m6 s12">
-          <input type="text" ng-model="Student.name" class="validate">
-          <label>Nome</label>
+          <input type="text" ng-model="Student.name" class="validate" placeholder="Nome">
         </div>
         <div class="input-field col m6 s12">
-          <input id="email" type="email" ng-model="Student.email" class="validate">
-          <label>Email</label>
+          <input id="text" type="text" ng-model="Student.email" class="validate" placeholder="Email">
         </div>
         <div class="input-field col m4 s12">
-          <input type="text" ng-model="Student.firstNote" class="validate">
-          <label>Nota 1</label>
+          <input type="text" ng-model="Student.firstNote" class="validate" placeholder="Nota 1">
         </div>
         <div class="input-field col m4 s12">
-          <input type="text" ng-model="Student.secondNote" class="validate">
-          <label>Nota 2</label>
+          <input type="text" ng-model="Student.secondNote" class="validate" placeholder="Nota 2">
         </div>
         <div class="input-field col m4 s12">
-          <input type="text" ng-model="Student.thirdNote" class="validate">
-          <label>Nota 3</label>
+          <input type="text" ng-model="Student.thirdNote" class="validate" placeholder="Nota 3">
         </div>
       </div>
     </div>
    
     <div class="modal-footer">
       <a class="modal-close waves-effect waves-green btn-flat" href="#!">Cancelar</a>
-      <a ng-click="addStudent(Student)" class="waves-effect waves-light btn">Salvar</a>
+      <a ng-click="saveStudent(Student)" class="waves-effect waves-light btn">Salvar</a>
     </div>
   </div>
 
@@ -109,40 +110,89 @@
       .controller("indexController", function ($scope) {
         $scope.title = "Sistema com Angular JS"
         $scope.students = [
-          { name: "Diana", email: "diana@email.com", firstNote: 85, secondNote: 80, thirdNote: 100 },
-          { name: "Laura", email: "laura@email.com", firstNote: 100, secondNote: 80, thirdNote: 55 },
-          { name: "Paulo", email: "paulo@email.com", firstNote: 65, secondNote: 90, thirdNote: 99 },
-          { name: "Pedro", email: "pedro@email.com", firstNote: 35, secondNote: 60, thirdNote: 55 },
-          { name: "Sofia", email: "sofia@email.com", firstNote: 35, secondNote: 50, thirdNote: 80 }
+          { _id: 0, name: "Diana", email: "diana@email.com", firstNote: 85, secondNote: 80, thirdNote: 100 },
+          { _id: 1, name: "Laura", email: "laura@email.com", firstNote: 100, secondNote: 80, thirdNote: 55 },
+          { _id: 2, name: "Paulo", email: "paulo@email.com", firstNote: 65, secondNote: 90, thirdNote: 99 },
+          { _id: 3, name: "Pedro", email: "pedro@email.com", firstNote: 35, secondNote: 60, thirdNote: 55 },
+          { _id: 4, name: "Sofia", email: "sofia@email.com", firstNote: 35, secondNote: 50, thirdNote: 80 }
         ]
+
+        $scope.isEdit = false
 
         var init = function () {
           $scope.students.forEach(function (student) {
             student.average = average(student)
           })
+          cleanFormData();
+        }
+
+        function parseNote(note){
+          return note ? parseFloat(note) : 0
         }
 
         var average = function (Student) {
-          var average = (parseFloat(Student.firstNote) + parseFloat(Student.secondNote) + parseFloat(Student.thirdNote)) / 3
+          var average = (parseNote(Student.firstNote) + parseNote(Student.secondNote) + parseNote(Student.secondNote)) / 3
           return average.toFixed(2)
         }
+
+        // var elem = document.querySelector('#addStudentModal')
+        // var instance = M.Modal.getInstance(elem)
 
         // $scope.average = function(Student){
         //   var average = (Student.firstNote + Student.secondNote + Student.thirdNote) / 3;
         //   return average.toFixed(2);
         // };
 
-        var closeAddStudentModal = function(){
+        var getInstanceAddStudentModal = function(){
           var elem = document.querySelector('#addStudentModal')
-          var instance = M.Modal.getInstance(elem)
+          return M.Modal.getInstance(elem)
+        }
+
+        var openAddStudentModal = async function(){
+          var instance = await getInstanceAddStudentModal()
+          instance.open()
+        }
+
+        var closeAddStudentModal = async function(){
+          var instance = await getInstanceAddStudentModal()
           instance.close();
         }
 
-        $scope.addStudent = function (Student) {
+        $scope.addStudent = async function(){
+          cleanFormData()
+          $scope.isEdit = false
+          openAddStudentModal()
+        }
+
+        $scope.editStudentModal = async function (Student) {
+          cleanFormData()
+          $scope.isEdit = true
+          //$scope.Student = { ...Student }
+          angular.copy(Student, $scope.Student)
+          openAddStudentModal()
+        }
+
+        $scope.saveStudent = function (Student) {
           Student.average = average(Student)
-          $scope.students.push(Student)
-          $scope.Student = {} //apagando registro, assim mesmo?
+          if(!$scope.isEdit){
+            //Student.average = average(Student)
+            Student._id = Math.random().toString(36).substr(2, 9);
+            $scope.students.push(Student)
+          }
+          else{
+            var index = $scope.students.findIndex(({ _id }) => _id === Student._id);
+            $scope.students[index] = Student
+          }
           closeAddStudentModal()
+        }
+
+        $scope.deleteStudent = function(Student) {
+          var index = $scope.students.findIndex(({ _id }) => _id === Student._id)
+          $scope.students.pop(index)
+        } 
+        
+        var cleanFormData = function(){
+          $scope.Student = {} //? apagando registro, assim mesmo? Os campos ficam em verdinho como se tivesse valor
         }
 
         init()
