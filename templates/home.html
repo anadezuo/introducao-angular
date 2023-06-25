@@ -1,0 +1,67 @@
+<div ng-include="'templates_nav.html'"></div>
+<main class="container">
+  <div class="row">
+    <input type="text" ng-model="search.name" placeholder="Busca pelo nome do aluno" id="">
+  </div>
+  <div class="row">
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Nota 1</th>
+          <th>Nota 2</th>
+          <th>Nota 3</th>
+          <th>Média</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="student in students | filter:search">
+          <td>{{student.name}}</td>
+          <td>{{student.email}}</td>
+          <td>{{student.firstNote}}</td>
+          <td>{{student.secondNote}}</td>
+          <td>{{student.thirdNote}}</td>
+          <td>{{student.average}}</td>
+          <td><button ng-click="editStudentModal(student)" class="btn">Editar</button></td>
+          <td><button ng-click="deleteStudent(student)" class="btn red">Excluir</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <a ng-click="addStudent()" class="waves-effect waves-light btn">Adicionar</a>
+  </div>
+</main>
+
+<!-- Modal Structure -->
+<div id="addStudentModal" class="modal">
+  <div class="modal-content">
+    <h4 ng-if="!isEdit">Adicionar Aluno</h4>
+    <h4 ng-if="isEdit">Editar Aluno</h4>
+    <p>Preencha os dados do aluno</p>
+    <div class="row">
+      <div class="input-field col m6 s12">
+        <input type="text" ng-model="Student.name" class="validate" placeholder="Nome">
+      </div>
+      <div class="input-field col m6 s12">
+        <input id="text" type="text" ng-model="Student.email" class="validate" placeholder="Email">
+      </div>
+      <div class="input-field col m4 s12">
+        <input type="text" ng-model="Student.firstNote" class="validate" placeholder="Nota 1">
+      </div>
+      <div class="input-field col m4 s12">
+        <input type="text" ng-model="Student.secondNote" class="validate" placeholder="Nota 2">
+      </div>
+      <div class="input-field col m4 s12">
+        <input type="text" ng-model="Student.thirdNote" class="validate" placeholder="Nota 3">
+      </div>
+    </div>
+  </div>
+ 
+  <div class="modal-footer">
+    <a class="modal-close waves-effect waves-green btn-flat" href="#!">Cancelar</a>
+    <a ng-click="saveStudent(Student)" class="waves-effect waves-light btn">Salvar</a>
+  </div>
+</div>

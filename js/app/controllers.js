@@ -72,7 +72,7 @@ angular.module('myModule').controller('indexController', function ($scope) {
     var average =
       (parseNote(Student.firstNote) +
         parseNote(Student.secondNote) +
-        parseNote(Student.secondNote)) /
+        parseNote(Student.thirdNote)) /
       3;
     return average.toFixed(2);
   };
@@ -129,7 +129,8 @@ angular.module('myModule').controller('indexController', function ($scope) {
 
   $scope.deleteStudent = function (Student) {
     var index = $scope.students.findIndex(({ _id }) => _id === Student._id);
-    $scope.students.pop(index);
+    console.log(index)
+    $scope.students.splice(index, 1)
   };
 
   var cleanFormData = function () {
@@ -137,4 +138,10 @@ angular.module('myModule').controller('indexController', function ($scope) {
   };
 
   init();
-});
+})
+
+
+.controller('contactController', function ($scope) {
+  //testar as rotas no firefox
+  $scope.title = "Contato"
+})
